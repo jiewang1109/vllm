@@ -477,6 +477,8 @@ class Sequence:
     def lora_int_id(self) -> int:
         return self.lora_request.lora_int_id if self.lora_request else 0
 
+    # property 关键词能够让一个方法像一个属性一样被访问，而不是被调用。
+    # 且 能够想调用attribute一样调用，不需要加括号。
     @property
     def prompt_adapter_id(self) -> int:
         return self.prompt_adapter_request.prompt_adapter_id \
@@ -495,6 +497,10 @@ class Sequence:
         length = len(self.output_text)
         if truncate:
             length -= buffer_length
+        
+        # 这里使用 self._last_output_text_offset 来记录上次返回文本时的偏移量（即上次返回的文本长度）。
+        # 如果上次的偏移量小于当前文本长度，说明有新文本生成，此时返回从上次偏移量到当前长度的增量文本，并更新偏移量为当前长度。
+        # 如果没有新增文本，则返回空字符串 ""。
         last_offset = self._last_output_text_offset
         if last_offset < length:
             self._last_output_text_offset = length
@@ -518,6 +524,8 @@ class Sequence:
         if num_new_tokens == 1:
             # Optimization for single decode token case
             # (which is what we have most of the time)
+            # self.data._cached_all_token_ids[-1] is O(1)
+            # self.data._cached_all_token_ids[-num_new_tokens:] is O(n)
             return self.data._cached_all_token_ids[-1]
 
         return self.data._cached_all_token_ids[-num_new_tokens:]

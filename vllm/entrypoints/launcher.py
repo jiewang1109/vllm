@@ -14,7 +14,7 @@ from vllm.utils import find_process_using_port
 
 logger = init_logger(__name__)
 
-
+# 启动FastAPI应用的异步HTTP服务器的函数
 async def serve_http(app: FastAPI, **uvicorn_kwargs: Any):
     logger.info("Available routes are:")
     for route in app.routes:
@@ -41,6 +41,7 @@ async def serve_http(app: FastAPI, **uvicorn_kwargs: Any):
     async def dummy_shutdown() -> None:
         pass
 
+    # 用于给事件循环注册信号处理函数，捕捉到这些信号时，执行对应的signal_handler，从而实现服务器的优雅关闭
     loop.add_signal_handler(signal.SIGINT, signal_handler)
     loop.add_signal_handler(signal.SIGTERM, signal_handler)
 

@@ -846,6 +846,7 @@ class EngineArgs:
         )
 
     def create_engine_config(self) -> EngineConfig:
+        # 将EngineArgs分解成ModelConfig，CacheConfig， ParallelConfig和SchedulerConfig
         # gguf file needs a specific model loader and doesn't use hf_repo
         if check_gguf_file(self.model):
             self.quantization = self.load_format = "gguf"
@@ -869,7 +870,8 @@ class EngineArgs:
         assert self.cpu_offload_gb >= 0, (
             "CPU offload space must be non-negative"
             f", but got {self.cpu_offload_gb}")
-
+        
+        # 对于每个 device（也即每张卡 / 每个 rank）创建一个 Worker
         device_config = DeviceConfig(device=self.device)
         model_config = self.create_model_config()
 

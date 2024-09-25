@@ -78,7 +78,14 @@ class RequestOutput:
         prompt_token_ids: The token IDs of the prompt.
                           For encoder/decoder models, this is the
                           decoder input prompt token ids.
+        
+        # the range of prompt_logprobs is [-无穷, 0]
+        # 越接近0，说明越有可能是下一个token
+        # temperature==1，词的选择概率与原始的 logprobs 对应的概率相同。
+        # temperature>1，词的选择概率会更加平滑，即更加均匀，概率低的词也可能出现。
+        # temperature<1，词的选择概率会更加尖锐，即更加集中,即越保守，选择概率最高的词。
         prompt_logprobs: The log probabilities to return per prompt token.
+        
         outputs: The output sequences of the request.
         finished: Whether the whole request is finished.
         metrics: Metrics associated with the request.
@@ -151,6 +158,8 @@ class RequestOutput:
             top_n_seqs = sorted_seqs[:n]
 
         # Create the outputs.
+        # 即使没有明确请求，生成的序列中依然会包含 logprobs，这可能是由于模型的内在机制。
+        # 为了避免产生不必要的输出或数据冗余，需要在输出时显式地剔除这些 logprobs，确保最终输出中只保留用户所请求的部分。
         # NOTE: We need omit logprobs here explicitly because the sequence
         # always has the logprobs of the sampled tokens even if the
         # logprobs are not requested.

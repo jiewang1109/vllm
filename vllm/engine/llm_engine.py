@@ -149,6 +149,10 @@ class LLMEngine:
         prompt_adapter_config (Optional): The configuration related to serving
             prompt adapters.
         log_stats: Whether to log statistics.
+        
+        // API_SERVER = "API_SERVER"
+        // OPENAI_API_SERVER = "OPENAI_API_SERVER"
+        // OPENAI_BATCH_RUNNER = "OPENAI_BATCH_RUNNER"
         usage_context: Specified entry point, used for usage info collection.
     """
 
@@ -686,6 +690,7 @@ class LLMEngine:
     def stop_remote_worker_execution_loop(self) -> None:
         self.model_executor.stop_remote_worker_execution_loop()
 
+    # 添加请求到引擎，请求将被调度器处理
     def add_request(
         self,
         request_id: str,
